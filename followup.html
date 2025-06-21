@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>متابعة بلاغ</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f1f1f1;
+      padding: 40px;
+      text-align: center;
+      direction: rtl;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 15px 0 5px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #2d6a4f;
+      color: white;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .success {
+      color: green;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📌 إدخال متابعة على بلاغ</h2>
+    <label for="serial">رقم البلاغ:</label>
+    <input type="number" id="serial" placeholder="أدخل رقم البلاغ" required>
+
+    <label for="followup">ملاحظات المتابعة:</label>
+    <textarea id="followup" rows="5" placeholder="أدخل تفاصيل المتابعة"></textarea>
+
+    <button onclick="submitFollowUp()">إرسال</button>
+    <div id="response" class="success"></div>
+  </div>
+
+  <script>
+    function submitFollowUp() {
+      const serial = document.getElementById("serial").value;
+      const followup = document.getElementById("followup").value;
+
+      if (!serial || !followup) {
+        alert("الرجاء إدخال جميع الحقول");
+        return;
+      }
+
+      fetch("https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec", {
+        method: "POST",
+        body: new URLSearchParams({
+          type: "followup",
+          serial: serial,
+          followup: followup
+        })
+      })
+      .then(res => res.text())
+      .then(msg => {
+        document.getElementById("response").innerText = msg;
+        document.getElementById("serial").value = '';
+        document.getElementById("followup").value = '';
+      })
+      .catch(err => {
+        alert("حدث خطأ أثناء الإرسال");
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>
