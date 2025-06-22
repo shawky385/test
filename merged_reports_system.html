@@ -198,7 +198,7 @@
     noData.textContent = 'جاري تحميل البيانات...';
     reportsTable.style.display = 'none';
 
-    fetch(`https://script.google.com/macros/s/AKfycbxWFqAdZ32oP4YDCOXcmYkC6q1CzTfqMqinLU9pv7l8KG3XRXeKf4oZMyK8r4ez1f-Y/exec?type=fetch&location=${encodeURIComponent(location)}`)
+    fetch(`https://script.google.com/macros/s/AKfycbxWFqAdZ32oP4YDCOXcmYkC6q1CzTfqMqinLU9pv7l8KG3XRXeKf4oZMyK8r4ez1f-Y/exec?location=${encodeURIComponent(location)}`)
       .then(res => res.json())
       .then(data => {
         if (data.length === 0) {
@@ -241,4 +241,3 @@
 
 </body>
 </html>
-
