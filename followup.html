@@ -17,23 +17,32 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
     }
     h2 {
       color: #2d6a4f;
-      text-align: center;
+      margin-bottom: 30px;
     }
     label {
       font-weight: bold;
       margin-bottom: 5px;
       display: block;
+      text-align: right;
     }
     textarea {
       width: 100%;
-      height: 120px;
+      height: 100px;
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
       resize: vertical;
+    }
+    .radio-group {
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    .radio-option {
+      margin-left: 15px;
     }
     button {
       margin-top: 20px;
@@ -52,26 +61,86 @@
       font-weight: bold;
       text-align: center;
     }
+    .header-images {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .header-images img {
+      max-width: 80px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>✏️ إضافة متابعة لبلاغ رقم <span id="serialDisplay"></span></h2>
-    <label for="followup">نص المتابعة:</label>
-    <textarea id="followup" placeholder="أدخل تفاصيل المتابعة هنا..."></textarea>
-    <button onclick="submitFollowup()">إرسال المتابعة</button>
-    <div class="success" id="result"></div>
-  </div>
 
+    <!-- ✅ الصور في الأعلى -->
+    <div class="header-images">
+      <img src="https://i.ibb.co/B2tgwJc7/244185720-370792891415541-7314683137032448754-n.png" alt="صورة إضافية" />
+      <img src="https://i.ibb.co/Z662KmYG/image.png" alt="شعار جامعة الزقازيق" />
+    </div>
+
+    <!-- ✅ عنوان الصفحة -->
+    <h2>✏️ إضافة متابعة لبلاغ رقم <span id="serialDisplay"></span></h2>
+
+    <!-- ✅ سؤال الحادث الجسيم -->
+    <label>حادث بالغ الخطورة (حدث جسيم):</label>
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="serious" value="نعم" /> نعم
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="serious" value="لا" /> لا
+      </label>
+    </div>
+
+    <!-- ✅ الإجراء التصحيحي -->
+    <label for="followup">الإجراء التصحيحي المتخذ:</label>
+    <textarea id="followup" placeholder="أدخل الإجراء التصحيحي هنا..."></textarea>
+
+    <!-- ✅ الإجراء الوقائي -->
+    <label for="preventive">الإجراء الوقائي :</label>
+    <textarea id="preventive" placeholder="أدخل الإجراء الوقائي هنا..."></textarea>
+
+    <!-- ✅ زر الإرسال -->
+    <button onclick="submitFollowup()">إرسال المتابعة</button>
+
+    <!-- ✅ رسالة النجاح -->
+    <div class="success" id="result"></div>
+
+    <!-- ✅ تذييل منسق -->
+    <div style="margin-top: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 12px; color: #555;">
+      <img src="https://i.ibb.co/Z662KmYG/image.png" alt="شعار الجامعة" style="width: 30px;" />
+      <div><strong>نظام الإبلاغ - وحدة الجودة - مستشفيات جامعة الزقازيق</strong></div>
+    </div>
+
+  </div> <!-- إغلاق container -->
+
+  <!-- ✅ JavaScript -->
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const serial = urlParams.get('serial');
     document.getElementById('serialDisplay').textContent = serial;
 
     function submitFollowup() {
-      const note = document.getElementById('followup').value;
-      if (!note.trim()) {
-        alert("يرجى كتابة نص المتابعة أولاً");
+      const corrective = document.getElementById('followup').value.trim();
+      const preventive = document.getElementById('preventive').value.trim();
+      const seriousValue = document.querySelector('input[name="serious"]:checked');
+
+      if (!seriousValue) {
+        alert("يرجى تحديد ما إذا كان الحادث جسيمًا أم لا");
+        return;
+      }
+
+      if (!corrective) {
+        alert("يرجى كتابة الإجراء التصحيحي أولاً");
+        return;
+      }
+
+      if (!preventive) {
+        alert("يرجى كتابة الإجراء الوقائي أولاً");
         return;
       }
 
@@ -80,7 +149,9 @@
         body: new URLSearchParams({
           type: "followup",
           serial: serial,
-          followup: note
+          followup: corrective,
+          preventive: preventive,
+          serious: seriousValue.value
         })
       })
       .then(res => res.text())
