@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام البلاغات</title>
+  <style>
+    /* Styles from index.html */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+    }
+
+    header {
+      background-color: #2d6a4f;
+      color: white;
+      padding: 20px 10px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 20px;
+      color: #1b4332;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Styles from details.html */
+    .details-section {
+      display: none; /* Hidden by default */
+      padding: 20px;
+    }
+
+    .details-section h2 {
+      text-align: center;
+      color: #2d6a4f;
+      margin-bottom: 20px;
+    }
+
+    .details-section table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .details-section th, .details-section td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .details-section th {
+      background-color: #2d6a4f;
+      color: white;
+    }
+
+    .details-section tr:hover {
+      background-color: #e3f6f5;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      background-color: #2d6a4f;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #888;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>نظام عرض البلاغات حسب القسم</h1>
+</header>
+
+<div id="mainPage" class="container">
+  <!-- سيتم تعبئة البطاقات هنا ديناميكيًا -->
+</div>
+
+<div id="detailsPage" class="details-section">
+  <a class="back-btn" href="#" onclick="showMainPage()">⬅️ رجوع</a>
+  <h2>بلاغات قسم <span id="locationTitle"></span></h2>
+
+  <table id="reportsTable">
+    <thead>
+      <tr>
+        <th>رقم</th>
+        <th>تاريخ</th>
+        <th>نوع الخطأ</th>
+        <th>وصف الواقعة</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div id="noData" class="no-data"></div>
+</div>
+
+<footer>
+  <p>وحدة الجودة - مستشفيات جامعة الزقازيق</p>
+</footer>
+
+<script>
+  const departments = [
+    "عمليات أ",
+    "عمليات ب",
+    "عناية الثاني",
+    "عناية الثالث",
+    "قسم الجراحة",
+    "وحدة زرع الكبد",
+    "قسم الاشعة والقسطرة",
+    "قسم مخ واعصاب باطنة",
+    "قسم جراحة النسا",
+    "صيدلية العناية والعمليات",
+    "أخرى"
+  ];
+
+  const mainPage = document.getElementById("mainPage");
+  const detailsPage = document.getElementById("detailsPage");
+  const locationTitle = document.getElementById('locationTitle');
+  const reportsTable = document.getElementById('reportsTable');
+  const tableBody = document.getElementById('tableBody');
+  const noData = document.getElementById('noData');
+
+  function showMainPage() {
+    mainPage.style.display = 'grid';
+    detailsPage.style.display = 'none';
+    // Clear previous data
+    tableBody.innerHTML = '';
+    noData.textContent = '';
+    reportsTable.style.display = 'none';
+  }
+
+  function showDetailsPage(deptName) {
+    mainPage.style.display = 'none';
+    detailsPage.style.display = 'block';
+    locationTitle.textContent = deptName;
+    fetchReports(deptName);
+  }
+
+  function fetchReports(location) {
+    tableBody.innerHTML = ''; // Clear previous data
+    noData.textContent = 'جاري تحميل البيانات...';
+    reportsTable.style.display = 'none';
+
+    fetch(`https://script.google.com/macros/s/AKfycbxWFqAdZ32oP4YDCOXcmYkC6q1CzTfqMqinLU9pv7l8KG3XRXeKf4oZMyK8r4ez1f-Y/exec?type=fetch&location=${encodeURIComponent(location)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length === 0) {
+          noData.textContent = "لا توجد بلاغات مسجلة لهذا القسم.";
+        } else {
+          reportsTable.style.display = 'table';
+          noData.textContent = ''; // Clear loading message
+          data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row.serial}</td>
+              <td>${row.date}</td>
+              <td>${row.error}</td>
+              <td>${row.description}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        }
+      })
+      .catch(err => {
+        noData.textContent = "حدث خطأ أثناء تحميل البيانات.";
+        console.error("Error fetching reports:", err);
+      });
+  }
+
+  // Initialize department cards
+  departments.forEach(dept => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h3>${dept}</h3>`;
+    card.onclick = () => {
+      showDetailsPage(dept);
+    };
+    mainPage.appendChild(card);
+  });
+
+  // Show main page on initial load
+  showMainPage();
+</script>
+
+</body>
+</html>
+
