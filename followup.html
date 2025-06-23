@@ -203,6 +203,14 @@
       .then(res => res.text())
       .then(txt => {
         document.getElementById('result').textContent = txt;
+
+        // ✅ تفريغ الحقول إذا تم الحفظ بنجاح
+        if (txt.includes("تم حفظ المتابعة")) {
+          document.getElementById('followup').value = "";
+          document.getElementById('preventive').value = "";
+          const radios = document.querySelectorAll('input[name="serious"]');
+          radios.forEach(r => r.checked = false);
+        }
       })
       .catch(() => {
         alert("حدث خطأ أثناء الإرسال، حاول مجددًا");
